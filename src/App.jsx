@@ -25,11 +25,20 @@ export default function App() {
   }
 
   return (
-    <>
-      <h1>File Thingy</h1>
-      <div>
+    <div>
+      <Header />
+      <body class="main-body">
         <input type="file" accept=".txt" onChange={HandleFileChange} />
-      </div>
-    </>
+      </body>
+    </div>
   )
+}
+
+// The persistent header for the application
+function Header() {
+  return (
+    <header>
+      <h1>Intelligence Analysis</h1>
+    </header>
+  );
 }
