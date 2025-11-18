@@ -1,4 +1,4 @@
-import './App.css'
+import './index.css'
 import { useState } from 'react'
 import FileParser from './FileParser.jsx'
 
@@ -10,6 +10,18 @@ export default function App() {
     const file = event.target.files[0];
     if (file) FileParser(file, setArray);
   };
+
+  // Create the input label for uploading the report file
+  const InputElement = (fileThing) => {
+    return (
+      <input 
+        type="file" 
+        accept=".txt" 
+        onChange={fileThing} 
+        className="file:mr-5 file:rounded-full file:border-0 file:bg-neutral-600 mb-5 file:px-4 file:drop-shadow-lg file:drop-shadow-neutral-900"
+      /> 
+    );
+  }
 
   // Element array to print report data
   const elements = [];
@@ -25,49 +37,69 @@ export default function App() {
   }
 
   return (
-    <div>
-      <header>
-        <h1>Intelligence Analysis</h1>
-        <div className="subheader">
-          Upload a dataset to analyze:
-          <input type="file" accept=".txt" onChange={HandleFileChange} /> 
+    <>
+      <DisplayHeader />
+      <body className="bg-stone-700">
+        <div className="flex justify-center pt-10">
+          <UploadDataBox fileChangeFunction={HandleFileChange}/>
         </div>
-      </header>
-      <MainComponentDisplay array={array} />
-    </div>
+      </body>
+    </>
   )
 }
 
-// Displays the data set format guide if the array is empty, or the report viewer if it is not empty
-function MainComponentDisplay(array) {
-  console.log(array);
-  // Display the data set guide if the array is empty
-  if (array == undefined || array.length < 1) {
-    console.log("dataset!");
-    return (<DatasetFormat />);
-  } 
+// Function to display the header for the page
+function DisplayHeader() {
+  return (
+    <header className="bg-stone-900 drop-shadow-md drop-shadow-neutral-900">
+      <h1 className="text-white font-mono text-center text-3xl pb-5 pt-5">
+      Intelligence Analysis
+      </h1>
+    </header>
+  );
+}
 
-  // Return the 
+// Dataset Upload Box
+function UploadDataBox(props) {
+  // ReactJS sillyness to pass the onChange handler down
+  const fileChange = (event) => {
+    props.fileChangeFunction(event);
+  }
+
+  return (
+    <div className="bg-stone-900 text-white font-mono text-center flex flex-col content-center px-10 pt-5 rounded-xl drop-shadow-md drop-shadow-neutral-900">
+      <label className="text-lg font-semibold pb-3">Upload a Report to Analyze</label>
+      <input 
+        type="file" 
+        accept=".txt" 
+        onChange={fileChange} 
+        className="self-center file:mr-5 file:rounded-full file:border-0 file:bg-neutral-600 mb-5 file:px-4 file:drop-shadow-lg file:drop-shadow-neutral-900"
+      /> 
+      <DatasetFormat />
+    </div>
+  );
 }
 
 // Display the format guidelines for a dataset
 function DatasetFormat() {
   return (
-    <div class="info-box">
-      <h3>Dataset Format Guidelines</h3>
-      <p>
+    <div className="bg-stone-800 max-w-2xl text-left px-10 pt-3 pb-3 mb-5 rounded-2xl inset-shadow-sm inset-shadow-neutral-900">
+      <h1 className="text-lg text-center pb-2">Report Format Guidelines</h1>
+      <p className="text-sm">
         The dataset must follow these formatting guidelines to be properly analyzed:
       </p>
-      <ul>
-        <li>Each report must be separated with a line that says "REPORT: "</li>
-        <li>
-          There must be lines started with ID:, REPORTDATE:, REFERENCEID:, REPORTSOURCE:,
-          REPORTDESCRIPTION:, PERSONS:, DATES:, and ORGANIZATIONS:.
-        </li>
-        <li>Dates must be in the format MM/DD/YYYY, however month and day can have one digit.</li>
-        <li>Places must be separated into four locations. If one is blank they still need a space. (e.g. Road/Town/State/Place)</li>
-        <li>Any lists must be separated by a semi-colon.</li>
-      </ul>
+      <div className="ml-4">
+        <ul>
+          <li>* Each report must be separated with a line that says "REPORT: "</li>
+          <li>
+            * There must be lines started with ID:, REPORTDATE:, REFERENCEID:, REPORTSOURCE:,
+            REPORTDESCRIPTION:, PERSONS:, DATES:, and ORGANIZATIONS:.
+          </li>
+          <li>* Dates must be in the format MM/DD/YYYY, however month and day can have one digit.</li>
+          <li>* Places must be separated into four locations. If one is blank they still need a space. (e.g. Road/Town/State/Place)</li>
+          <li>* Any lists must be separated by a semi-colon.</li>
+        </ul>
+      </div>
     </div>
   )
 }
