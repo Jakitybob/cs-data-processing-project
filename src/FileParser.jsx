@@ -3,50 +3,27 @@ import ReportData from './Report'
 import Location from './Location'
 
 // Reads the given report text file and breaks it up assuming it follows the correct format
-export default function FileParser() {
-  // Create a state for our array
-  const [array, setArray] = useState([]);
-  
-  // When the input is changed, check if a file was selected
-  const HandleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) ParseFile(file);
-  };
+export default function FileParser(file, setArrayFunction) {
+  const tempArray = []; // Temporary array to return later
 
-  // Parse the file line by line, sending report objects to the report array
-  const ParseFile = (file) => {
-    // Create a file reader object and bind logic to its onload event
-    const reader = new FileReader(); 
-    reader.onload = (event) => {
-      // Split each report in the text file for parsing
-      const content = event.target.result;
-      const reports = content.split("REPORT\n");
-      const tempArray = []; // Temporary array to return later
-      for (const report of reports) {
-        if (report == reports[0]) continue; // Skip first report as it is empty because of how split works
-        tempArray.push(GenerateReport(report));
-      }
-
-      // Update our array state
-      setArray(tempArray);
+  // Create a file reader object and bind logic to its onload event
+  const reader = new FileReader(); 
+  reader.onload = (event) => {
+    // Split each report in the text file for parsing
+    const content = event.target.result;
+    const reports = content.split("REPORT\n");
+    for (const report of reports) {
+      if (report == reports[0]) continue; // Skip first report as it is empty because of how split works
+      tempArray.push(GenerateReport(report));
     }
 
-    // Have the reader load the text file
-    reader.readAsText(file);
+    // Once fully read, pass out the array via the state set function
+    setArrayFunction(tempArray);
   }
 
-  const elements = [];
-
-  for (let index = 0; index < array.length; index++) {
-    elements.push(<p key={index}>{array[index].id}</p>)
-  }
-
-  return (
-    <div>
-      <input type="file" accept=".txt" onChange={HandleFileChange}/>
-      {elements}
-    </div>
-  );
+  // Have the reader load the text file
+  reader.readAsText(file);
+  // The rest of the functionality from here is in the reader.onload lambda
 }
 
 // Returns a report object
