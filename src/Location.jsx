@@ -16,6 +16,4 @@ export default class Location {
         this.state = locationParts[2];
         this.country = locationParts[3];
     };
-
-    
 }

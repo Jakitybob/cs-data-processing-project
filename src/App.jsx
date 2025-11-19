@@ -1,39 +1,39 @@
 import './index.css'
 import { useState } from 'react'
 import FileParser from './FileParser.jsx'
+import ReportView from './ReportView.jsx'
+import ReportStatistics from './Statistics.jsx'
+import { Barplot } from './Barplot.jsx'
 
 export default function App() {
   const [array, setArray] = useState([]);
+  const reportStatistics = new ReportStatistics();
+  const [repStats, setRepStats] = useState(new ReportStatistics());
 
   // Call the FileParser when the input box changes
   const HandleFileChange = (event) => {
     const file = event.target.files[0];
-    if (file) FileParser(file, setArray);
+    if (file) FileParser(file, setArray, repStats, setRepStats);
   };
 
-  // Create the input label for uploading the report file
-  const InputElement = (fileThing) => {
-    return (
-      <input 
-        type="file" 
-        accept=".txt" 
-        onChange={fileThing} 
-        className="file:mr-5 file:rounded-full file:border-0 file:bg-neutral-600 mb-5 file:px-4 file:drop-shadow-lg file:drop-shadow-neutral-900"
-      /> 
-    );
+  const Eep = (array) => {
+    if (repStats.NameFrequency.size <= 0) return <></>
+    else return <Barplot data={repStats.NameFrequency} width={700} height={400} color={"#004a8aff"}/>
   }
-
-  // Element array to print report data
-  const elements = [];
 
   // Test print
   if (array.length > 0) {
-    for (let report of array) {
-      elements.push(
-      <p>Report {report.id}:</p>
-    )}
-
-    return <div>{elements}</div>
+    return (
+      <>
+        <DisplayHeader />
+        <body className="bg-stone-700">
+          <div className="flex flex-col items-center justify-center pt-10">
+            <ReportView reportArray={array}/>
+            <Eep array={array}/>
+          </div>
+        </body>
+      </>
+    )
   }
 
   return (
