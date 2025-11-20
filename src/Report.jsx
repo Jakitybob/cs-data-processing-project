@@ -63,4 +63,46 @@ export default class ReportData {
   AddOrganization(org) {
     this.#organizations.push(org);
   }
+
+  // Check if this report contains the provided string within
+  ContainsString(string) {
+    // Check if the ID matches the string
+    if (string == this.id) return true;
+
+    // Check if the string matches any persons
+    for (let person of this.#persons) {
+      // Check for a full name match or a partial match
+      if (string == person) return true;
+      const names = person.split(' ');
+      for (let name of names) {
+        if (string == name) return true;
+      }
+    }
+    
+    // Check if the string matches any locations
+    for (let loc of this.#locations) {
+      if (string == loc[1]) return true;
+      if (string == loc[2]) return true;
+      if (string == loc[3]) return true;
+    }
+
+    // Check if the string matches any organizations
+    for (let org of this.#organizations) {
+      if (string == org) return true;
+    }
+
+    // Check if the string matches any dates
+    for (let date of this.#dates) {
+      // Check if the date matches a year
+      if (string == date.getFullYear()) return true;
+
+      // Check if a date matches mm/yyyy
+      if (string == date.getMonth() + "/" + date.getFullYear()) return true;
+
+      // Create a string for the date
+      if (string == date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear()) return true;
+    }
+
+    return false;
+  }
 }

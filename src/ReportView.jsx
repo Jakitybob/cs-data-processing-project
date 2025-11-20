@@ -1,22 +1,36 @@
 import { useState } from 'react'
 import './index.css'
-import ReportData from './Report'
-import Location from './Location'
 
 export default function ReportView(reportArray) {
   const [selectedReport, setSelectedReport] = useState();
+  const [textInput, setTextInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Scrollbox of reports by ID
+  // Stop default form reload
+  async function HandleSubmit(event) {
+    event.preventDefault(); // Stop the default page reload from a form submission
+    setSearchTerm(textInput);
+  }
+
+  // Set the search term
+  function HandleTextChange(event) {
+    setTextInput(event.target.value);
+  }
+
+  // Window that shows reports generated from the file as well as a search bar
   return (
     <div className="flex-col bg-stone-900 px-5 pt-3 pb-3 text-white font-mono rounded-xl shadow-md shadow-neutral-900">
       <div className="flex justify-between">
         <h1 className="text-xl">Report Detail Viewer</h1>
-        <form>
-          <textarea/>
-        </form>
+        <div className="flex gap-3">
+          <label>Search reports by term:</label>
+          <form onSubmit={HandleSubmit}>
+            <input className="bg-stone-800 text-white rounded-lg pl-2 pr-2" onChange={HandleTextChange}/>
+          </form>
+        </div>
       </div>
       <div className="max-h-110 flex justify-center gap-5 pt-3 pb-3 text-white font-mono">
-        <ScrollableList reports={reportArray} selectedReport={selectedReport} onSelectReport={setSelectedReport} />
+        <ScrollableList reports={reportArray} selectedReport={selectedReport} onSelectReport={setSelectedReport} searchTerm={searchTerm} />
         <ShowReport index={selectedReport} array={reportArray}/>
       </div>
     </div>
@@ -24,19 +38,30 @@ export default function ReportView(reportArray) {
 }
 
 // Generates a scrollable list of all reports
-function ScrollableList({ reports, selectedReport, onSelectReport }) {
+function ScrollableList({ reports, selectedReport, onSelectReport, searchTerm }) {
   // Array of selectable elements
   const elements = [];
   if (reports.reportArray.length > 0) {
     for (let index = 0; index < reports.reportArray.length; index++) {
-      elements.push(
-        <li key={reports.reportArray[index].id} className="cursor-pointer text-white bg-stone-600 my-3 mr-3 pl-2 rounded-lg" onClick={() => onSelectReport(index)}>Report: {reports.reportArray[index].id}</li>
-      );
+      // If there is no search term, push all reports
+      if (searchTerm == null || searchTerm == "") {
+        elements.push(
+          <li key={reports.reportArray[index].id} className="cursor-pointer text-white bg-stone-600 my-3 mr-3 pl-2 rounded-lg" onClick={() => onSelectReport(index)}>Report: {reports.reportArray[index].id}</li>
+        );
+      }
+      // Otherwise only push reports that have the matching term within
+      else {
+        if (reports.reportArray[index].ContainsString(searchTerm)) {
+          elements.push(
+            <li key={reports.reportArray[index].id} className="cursor-pointer text-white bg-stone-600 my-3 mr-3 pl-2 rounded-lg" onClick={() => onSelectReport(index)}>Report: {reports.reportArray[index].id}</li>
+          );
+        }
+      }
     }
   }
 
   return (
-    <div className="min-h-100 overflow-y-auto">
+    <div className="min-h-100 min-w-42 overflow-y-auto">
       <ul className="">
         {elements}
       </ul>

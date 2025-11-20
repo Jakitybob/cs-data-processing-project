@@ -1,7 +1,4 @@
-import { useState } from 'react'
 import ReportData from './Report'
-import Location from './Location'
-import ReportStatistics from './Statistics.jsx'
 
 // Reads the given report text file and breaks it up assuming it follows the correct format
 export default function FileParser(file, setArrayFunction, reportStats, setReportStatistics) {
@@ -21,7 +18,6 @@ export default function FileParser(file, setArrayFunction, reportStats, setRepor
 
     // Once fully read, pass out the array via the state set function
     setArrayFunction(tempArray);
-    console.log(reportStatistics)
     setReportStatistics(reportStatistics);
   }
 
@@ -86,8 +82,12 @@ function HandleSeparatedList(reportObjectRef, string, reportDataType, reportStat
         break;
       case "DATES: ":
         reportObjectRef.AddDate(ReportStringToDate(d));
-        if (reportStatistics.DateFrequency.has(d)) reportStatistics.DateFrequency.set(d, reportStatistics.DateFrequency.get(d) + 1)
-        else reportStatistics.DateFrequency.set(d, 1);
+        const numbers = d.split('/');
+        let date = "";
+        if (numbers[0] == " ") date = numbers[2];
+        else if (numbers[1] == " ") date = numbers[0] + "/" + numbers[2];
+        else date = d;
+        AddStatistic(reportStatistics.DateFrequency, date);
         break;
       case "REFERENCEID: ":
         reportObjectRef.AddReferenceID(d);
@@ -97,24 +97,20 @@ function HandleSeparatedList(reportObjectRef, string, reportDataType, reportStat
         reportObjectRef.AddLocation(location);
         // Town frequency
         if (location[1] !== " ") {
-          if (reportStatistics.TownFrequency.has(location[1])) reportStatistics.TownFrequency.set(location[1], reportStatistics.TownFrequency.get(location[1]) + 1)
-          else reportStatistics.TownFrequency.set(location[1], 1);
+          AddStatistic(reportStatistics.TownFrequency, location[1]);
         }
         // State/province frequency
         if (location[2] !== " ") {
-          if (reportStatistics.StateFrequency.has(location[2])) reportStatistics.StateFrequency.set(location[2], reportStatistics.StateFrequency.get(location[2]) + 1)
-          else reportStatistics.StateFrequency.set(location[2], 1);
+          AddStatistic(reportStatistics.StateFrequency, location[2]);
         }
         // Country frequency
-        if (location[1] !== " ") {
-          if (reportStatistics.CountryFrequency.has(location[3])) reportStatistics.CountryFrequency.set(location[3], reportStatistics.CountryFrequency.get(location[3]) + 1)
-          else reportStatistics.CountryFrequency.set(location[3], 1);
+        if (location[3] !== " ") {
+          AddStatistic(reportStatistics.CountryFrequency, location[3]);
         }
         break;
       case "ORGANIZATIONS: ":
         reportObjectRef.AddOrganization(d);
-        if (reportStatistics.OrgFrequency.has(d)) reportStatistics.OrgFrequency.set(d, reportStatistics.OrgFrequency.get(d) + 1)
-        else reportStatistics.OrgFrequency.set(d, 1);
+        AddStatistic(reportStatistics.OrgFrequency, d);
         break;
     }
   }

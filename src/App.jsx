@@ -7,7 +7,6 @@ import { Barplot } from './Barplot.jsx'
 
 export default function App() {
   const [array, setArray] = useState([]);
-  const reportStatistics = new ReportStatistics();
   const [repStats, setRepStats] = useState(new ReportStatistics());
 
   // Call the FileParser when the input box changes
@@ -26,12 +25,12 @@ export default function App() {
     return (
       <>
         <DisplayHeader />
-        <body className="bg-stone-700">
-          <div className="flex flex-col items-center justify-center pt-10">
+        <div className="bg-stone-700 min-h-screen">
+          <div className="flex flex-col items-center justify-center pt-10 pb-20 gap-10">
             <ReportView reportArray={array}/>
-            <Eep array={array}/>
+            <DisplayGraphs reportStatistics={repStats} />
           </div>
-        </body>
+        </div>
       </>
     )
   }
@@ -39,11 +38,11 @@ export default function App() {
   return (
     <>
       <DisplayHeader />
-      <body className="bg-stone-700">
+      <div className="bg-stone-700 min-h-screen">
         <div className="flex justify-center pt-10">
           <UploadDataBox fileChangeFunction={HandleFileChange}/>
         </div>
-      </body>
+      </div>
     </>
   )
 }
@@ -102,4 +101,53 @@ function DatasetFormat() {
       </div>
     </div>
   )
+}
+
+// Display a collection of bar graphs that visualize data frequency from reports
+function DisplayGraphs({ reportStatistics }) {
+  // Create an array to store the graphs in
+  const graphElements = [];
+
+  // Create frequency graphs if they have data within
+  if (reportStatistics.NameFrequency.length > 0) {
+    graphElements.push(<CreateGraph data={reportStatistics.NameFrequency} color={"#00a5c2ff"} label={"Frequency of Names"} />)
+  }
+
+  if (reportStatistics.TownFrequency.length > 0) {
+    graphElements.push(<CreateGraph data={reportStatistics.TownFrequency} color={"#00398aff"} label={"Frequency of Towns"} />)
+  }
+
+  if (reportStatistics.StateFrequency.length > 0) {
+    graphElements.push(<CreateGraph data={reportStatistics.StateFrequency} color={"#4e008aff"} label={"Frequency of States/Provinces"} />)
+  }
+
+  if (reportStatistics.CountryFrequency.length > 0) {
+    graphElements.push(<CreateGraph data={reportStatistics.CountryFrequency} color={"#7a008aff"} label={"Frequency of Countries"} />)
+  }
+
+  if (reportStatistics.DateFrequency.length > 0) {
+    graphElements.push(<CreateGraph data={reportStatistics.DateFrequency} color={"#8a003eff"} label={"Frequency of Dates"} />)
+  }
+
+  if (reportStatistics.OrgFrequency.length > 0) {
+    graphElements.push(<CreateGraph data={reportStatistics.OrgFrequency} color={"#8a0000ff"} label={"Frequency of Organizations"} />)
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3">
+      {graphElements}
+    </div>
+  );
+}
+
+// Create a graph of the specified date type and color with the desired label
+function CreateGraph({ data, color, label }) {
+  return (
+    <div className="text-center text-white font-mono">
+      <Barplot data={data} width={700} height={400} color={color} />
+      <label>
+        {label}
+      </label>
+    </div>
+  );
 }
